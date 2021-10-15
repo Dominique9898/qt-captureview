@@ -30,29 +30,26 @@ ScreenWidget::~ScreenWidget()
 void ScreenWidget::initCaptureWindow()
 {
 
-Qt::WindowFlags windowFlags =  Qt::WindowStaysOnTopHint;
-this->setWindowFlags(windowFlags);
-setAttribute(Qt::WA_QuitOnClose,false);
 
-//#ifdef WIN32
+#ifdef WIN32
 
-//    initGlobalScreen();
+    initOriginBackgroundScreen();
 
-//    showFullScreen();
+    showFullScreen();
 
-//#elif __APPLE__
+#elif __APPLE__
 
-//    Qt::WindowFlags windowFlags =  Qt::FramelessWindowHint |
-//            Qt::BypassWindowManagerHint |
-//            Qt::WindowStaysOnTopHint |
-//            Qt::NoDropShadowWindowHint;
+    Qt::WindowFlags windowFlags =  Qt::FramelessWindowHint |
+            Qt::BypassWindowManagerHint |
+            Qt::WindowStaysOnTopHint |
+            Qt::NoDropShadowWindowHint;
 
-//    this->setWindowFlags(windowFlags);
+    this->setWindowFlags(windowFlags);
 
-//    initGlobalScreen();
+    initOriginBackgroundScreen();
 
-//    show();
-//#endif
+    show();
+#endif
 }
 
 void ScreenWidget::destroy()
@@ -65,6 +62,7 @@ void ScreenWidget::destroy()
 
 void ScreenWidget::startCapture(int id)
 {
+    qDebug() << "startCapture screen_" << id;
     screenId = id;
     initOriginBackgroundScreen();
     initGrayBackgroundScreen();
@@ -77,7 +75,7 @@ void ScreenWidget::initOriginBackgroundScreen()
     qDebug() << "screen" << screenId;
 
     // 截取当前桌面，作为截屏的背景图
-//    w_screen = QApplication::screens()[screenId];
+    w_screen = QApplication::screens()[screenId];
     const QRect& temp_rect = w_screen->geometry();
     s_width = temp_rect.width();
     s_height = temp_rect.height();

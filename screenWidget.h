@@ -7,6 +7,7 @@
 #include <QBrush>
 #include <QMouseEvent>
 #include <QDebug>
+#include <QMutex>
 #define SCREENCAPTURE_H
 
 

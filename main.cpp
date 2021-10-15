@@ -11,13 +11,18 @@ typedef struct{
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    QList<QScreen*> screens = QGuiApplication::screens();
+    qDebug() << "-- 截图程序启动 --";
+
+    QList<QScreen*> screens = QGuiApplication::screens();    
     int nums = screens.size();
+    qDebug() << "screen sizes=" << nums;
+
     ScreenWidget m_screens[nums];
 
 
     for (int i = 0; i < nums; i++)
     {
+        qDebug() << "创建 screen_" << i;
         m_screens[i].setGeometry(screens[i]->geometry());
         m_screens[i].setScreen(screens[i]);
         m_screens[i].startCapture(i);
