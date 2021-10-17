@@ -162,26 +162,8 @@ void Shape::resize(QPoint delta_p, int m_activeSide) {
             default:
                 break;
         }
-    // if lx, ly, rx, ry is not a legal value, revert.
-    if (lx < 0) {
-        lx = 0;
-        rx -= delta_p.x();
-    }
 
-    if (ly < 0) {
-        ly = 0;
-        ry -= delta_p.y();
-    }
-
-    if (rx > maxWidth)  {
-        rx = maxWidth;
-        lx -= delta_p.x();
-    }
-
-    if (ry > maxHeight) {
-        ry = maxHeight;
-        ly -= delta_p.y();
-    }
+    qDebug() << "lx=" << lx << "ly=" << ly<< "rx" << rx << "ry" << ry;
 
     topLeftPoint = QPoint(lx, ly);
     bottomRightPoint = QPoint(rx, ry);

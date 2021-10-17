@@ -251,20 +251,18 @@ void ScreenWidget::mouseReleaseEvent(QMouseEvent *e)
 }
 void ScreenWidget::paintEvent(QPaintEvent*)
 {
+    drawSelectRect();
     STATUS status = getStatus();
     switch (status) {
     case SELECT:
            qDebug() << "--- paintEvent SELECT";
-            drawSelectRect();
             break;
     case MOV:
         if (!isPress) return;
         qDebug() << "--- paintEvent MOV";
-        drawSelectRect();
         break;
     case RESIZE:
         qDebug() << "--- paintEvent RESIZE";
-        drawSelectRect();
         break;
     case DRAW:
         break;
@@ -276,7 +274,6 @@ void ScreenWidget::paintEvent(QPaintEvent*)
 void ScreenWidget::drawSelectRect()
 {
     qDebug() << "--- drawSelectRect start ---";
-    if (!isPress && !isMoving) return;
     m_painter.begin(this);
     m_painter.save();
     QPen pen;
