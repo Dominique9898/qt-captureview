@@ -164,10 +164,9 @@ void ScreenWidget::keyPressEvent(QKeyEvent *e)
 void ScreenWidget::mousePressEvent(QMouseEvent *e)
 {
     if (!(e->buttons() & Qt::LeftButton)) return;
+    changeCurcorToAnchor(e->pos());
+
     STATUS status = getStatus();
-
-
-
 
     switch (status) {
     case SELECT:
@@ -175,6 +174,8 @@ void ScreenWidget::mousePressEvent(QMouseEvent *e)
             isPress = true;
             m_captureRect.setStart(e->pos());
             break;
+    case RESIZE:
+        break;
     case MOV:
         if (!m_captureRect.isInArea(e->pos())) {
             qDebug() << "--- Press MOV 不在选框内 ---";
@@ -185,8 +186,6 @@ void ScreenWidget::mousePressEvent(QMouseEvent *e)
         s_movePoint = e->pos();
         isPress = true;
         this->setCursor(Qt::SizeAllCursor);
-        break;
-    case RESIZE:
         break;
     case DRAW:
         break;
@@ -206,6 +205,10 @@ void ScreenWidget::mouseMoveEvent(QMouseEvent *e)
             this->update();
             qDebug() << "--- Move UPDATE ---";
             break;
+    case RESIZE:
+        qDebug() << "--- Move RESIZE ---";
+        qDebug() << "--- Move RESIZE UPDATE---";
+        break;
     case MOV:
         qDebug() << "--- Move MOV ---";
         int x = e->pos().x() - s_movePoint.x();
@@ -216,8 +219,6 @@ void ScreenWidget::mouseMoveEvent(QMouseEvent *e)
         this->update();
         qDebug() << "--- Move MOV UPDATE---";
         break;
-//    case RESIZE:
-//        break;
 //    case DRAW:
 //        break;
 //    default:
@@ -227,33 +228,32 @@ void ScreenWidget::mouseMoveEvent(QMouseEvent *e)
 
 void ScreenWidget::mouseReleaseEvent(QMouseEvent *e)
 {
-    if (!isPress) return;
+    isPress = false;
+    if (getWidth() == 0 && getHeight() == 0) return;
     STATUS status = getStatus();
     switch (status) {
     case SELECT:
             qDebug() << "--- Release 结束SELECT选框 ---";
             m_captureRect.setEnd(e->pos());
             setStatus(MOV);
-            isPress = false;
-
             assistPixmap = QPixmap(getWidth(), getHeight());
             assistPixmap.fill(Qt::transparent);
             m_painter.drawPixmap(getX(), getY(), assistPixmap);
-
-            this->update();
             qDebug() << "--- Release 结束SELECT选框 UPDATE ---";
+//            this->update();
             break;
+    case RESIZE:
+        this->setCursor(Qt::ArrowCursor);
+        setStatus(MOV);
+        break;
     case MOV:
         qDebug() << "--- Release 结束MOV选框 ---";
-        isPress = false;
         assistPixmap = QPixmap(getWidth(), getHeight());
         assistPixmap.fill(Qt::transparent);
         m_painter.drawPixmap(getX(), getY(), assistPixmap);
-        this->update();
-        qDebug() << "--- Release 结束MOV选框 UPDATE ---";
         this->setCursor(Qt::ArrowCursor);
-        break;
-    case RESIZE:
+        qDebug() << "--- Release 结束MOV选框 UPDATE ---";
+//        this->update();
         break;
     case DRAW:
         break;
@@ -266,10 +266,12 @@ void ScreenWidget::paintEvent(QPaintEvent*)
     STATUS status = getStatus();
     switch (status) {
     case SELECT:
+            if (getWidth() == 0 && getHeight() == 0) return;
             if (!isPress) drawResizeCircles();
             drawSelectRect();
             break;
     case MOV:
+        if (getWidth() == 0 && getHeight() == 0) return;
         if (!isPress) drawResizeCircles();
         drawSelectRect();
         break;
@@ -284,6 +286,7 @@ void ScreenWidget::paintEvent(QPaintEvent*)
 }
 void ScreenWidget::drawSelectRect()
 {
+    qDebug() << "--- drawSelectRect start ---";
     m_painter.begin(this);
     m_painter.save();
     QPen pen;
@@ -300,6 +303,8 @@ void ScreenWidget::drawSelectRect()
     drawResizeCircles();
     m_painter.restore();
     m_painter.end();
+    qDebug() << "--- drawSelectRect end ---";
+
 }
 void ScreenWidget::drawResizeCircles()
 {
@@ -344,3 +349,57 @@ void ScreenWidget::drawResizeCircles()
     qDebug() << "--- 结束画Resize点 ---";
 }
 
+void ScreenWidget::changeCurcorToAnchor(QPoint p) {
+    qDebug() << "--- changeCurcorToAnchor start ---";
+    int x = p.x();
+    int y = p.y();
+    int radius = 3 * scaleFactor;
+    for (int i = 0; i < 8; i++)
+    {
+        QPoint c_Point = circles[i];
+        qDebug() << "circle_" << i << " x="<<c_Point.x()<<" y="<<c_Point.y();
+
+        if (abs(x - c_Point.x()) <= radius && abs(y - c_Point.y()) <= radius)
+        {
+            qDebug() << "has m_activeSide" << i;
+            m_activeSide = MouseType(i);
+            setStatus(RESIZE);
+            break;
+        }
+    }
+    qDebug() << "m_activeSide = " << m_activeSide;
+
+    switch (m_activeSide) {
+            case TOPLEFT_SIDE:
+                setCursor(Qt::SizeFDiagCursor);
+                break;
+            case TOP_SIDE:
+                setCursor(Qt::SizeVerCursor);
+                break;
+            case TOPRIGHT_SIDE:
+                setCursor(Qt::SizeBDiagCursor);
+                break;
+
+            case LEFT_SIDE:
+                setCursor(Qt::SizeHorCursor);
+                break;
+            case RIGHT_SIDE:
+                setCursor(Qt::SizeHorCursor);
+                break;
+
+            case BOTTOMLEFT_SIDE:
+                setCursor(Qt::SizeBDiagCursor);
+                break;
+            case BOTTOM_SIDE:
+                setCursor(Qt::SizeVerCursor);
+                break;
+            case BOTTOMRIGHT_SIDE:
+                setCursor(Qt::SizeFDiagCursor);
+                break;
+            default:
+                setCursor(Qt::ArrowCursor);
+                break;
+        }
+    qDebug() << "--- changeCurcorToAnchor end ---";
+
+}

@@ -9,7 +9,7 @@
 #include <QDebug>
 #include <QMutex>
 #include "Shape/shape/shape.h"
-
+#include <math.h>
 #define SCREENCAPTURE_H
 
 
@@ -20,6 +20,19 @@ class ScreenWidget : public QWidget
 public:
     // VOID 只第一次按下鼠标
     enum STATUS { SELECT, MOV, RESIZE, DRAW};
+
+    enum MouseType {
+        TOPLEFT_SIDE, // SizeFDiagCursor
+        TOP_SIDE, //  SizeVerCursor
+        TOPRIGHT_SIDE, // SizeBDiagCursor
+
+        LEFT_SIDE, // SizeHorCursor
+        RIGHT_SIDE, // SizeHorCursor
+
+        BOTTOMLEFT_SIDE, // SizeBDiagCursor
+        BOTTOM_SIDE, // SizeVerCursor
+        BOTTOMRIGHT_SIDE, // SizeFDiagCursor,
+    };
 
     ///控制选区变化的圆点
     QPoint circles[8] = {};
@@ -56,6 +69,7 @@ private:
     int scaleFactor;
 
     STATUS status;
+    MouseType m_activeSide;
 
     /// captureWin 对应的screen
     QScreen* w_screen;
@@ -81,6 +95,7 @@ private:
 
     /// 辅助涂鸦画布(resize点)
     QPixmap assistPixmap;
+
 protected:
 //        /**
 //         * @brief : 关闭窗口事件
@@ -140,5 +155,8 @@ private:
 
     ///绘制Resize的点
     void drawResizeCircles();
+
+
+    void changeCurcorToAnchor(QPoint p);
 };
 #endif // SCREENCAPTURE_H
