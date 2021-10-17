@@ -1,9 +1,9 @@
 #ifndef TOOLBARWIDGET_H
+#include <QDebug>
+#include <QWidget>
 #define TOOLBARWIDGET_H
 
-#include <QWidget>
-class ScreenCapture;
-
+class ScreenWidget;
 namespace Ui {
 class ToolbarWidget;
 }
@@ -14,11 +14,14 @@ class ToolbarWidget : public QWidget
 
 public:
     explicit ToolbarWidget(QWidget *parent = nullptr);
+
     ~ToolbarWidget();
 
     void setPosition(QPoint &bottomRight);
     void unCheckedAllButtons();
+
     Ui::ToolbarWidget* getUi();
+    ScreenWidget* m_screenWidget;
 
 private slots:
 
