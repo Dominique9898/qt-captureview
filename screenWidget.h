@@ -1,4 +1,7 @@
 #ifndef SCREENCAPTURE_H
+#include "UI/colortoolbarwidget/colortoolbarwidget.h"
+#include "UI/toolbarwidget/toolbarwidget.h"
+
 #include <QWidget>
 #include <QApplication>
 #include <QDesktopWidget>
@@ -96,6 +99,9 @@ private:
     /// 辅助涂鸦画布(resize点)
     QPixmap assistPixmap;
 
+    ToolbarWidget* toolbar;
+    ColorToolbarWidget* colorbar;
+
 protected:
 //        /**
 //         * @brief : 关闭窗口事件
@@ -153,10 +159,15 @@ private:
     /// 绘制拉取的选框的原图
     void drawSelectRect();
 
+    /// Resize 选框
+    void updateSelectRect();
+
     ///绘制Resize的点
     void drawResizeCircles();
 
-
     void changeCurcorToAnchor(QPoint p);
+
+    void updateToolBar();
+
 };
 #endif // SCREENCAPTURE_H

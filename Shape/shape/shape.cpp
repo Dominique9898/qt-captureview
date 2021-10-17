@@ -107,6 +107,75 @@ void Shape::move(QPoint delta_p)
         startPoint = topLeftPoint;
         endPoint = bottomRightPoint;
 }
+void Shape::resize(QPoint delta_p, int m_activeSide) {
+    // todo
+    m_activeSide = MouseType(m_activeSide);
+    int lx = topLeftPoint.x();
+    int ly = topLeftPoint.y();
+    int rx = bottomRightPoint.x();
+    int ry = bottomRightPoint.y();
+
+
+    switch (m_activeSide) {
+            case TOPLEFT_SIDE:
+            lx += delta_p.x();
+            ly += + delta_p.y();
+                break;
+            case TOP_SIDE:
+            ly += + delta_p.y();
+                break;
+            case TOPRIGHT_SIDE:
+            ly += + delta_p.y();
+            rx += + delta_p.x();
+                break;
+
+            case LEFT_SIDE:
+            lx += delta_p.x();
+                break;
+            case RIGHT_SIDE:
+            rx += delta_p.x();
+                break;
+
+            case BOTTOMLEFT_SIDE:
+            lx += delta_p.x();
+            ry += + delta_p.y();
+                break;
+            case BOTTOM_SIDE:
+            ry += delta_p.y();
+                break;
+            case BOTTOMRIGHT_SIDE:
+            rx += delta_p.x();
+            ry += delta_p.y();
+                break;
+            default:
+                break;
+        }
+    // if lx, ly, rx, ry is not a legal value, revert.
+    if (lx < 0) {
+        lx = 0;
+        rx -= delta_p.x();
+    }
+
+    if (ly < 0) {
+        ly = 0;
+        ry -= delta_p.y();
+    }
+
+    if (rx > maxWidth)  {
+        rx = maxWidth;
+        lx -= delta_p.x();
+    }
+
+    if (ry > maxHeight) {
+        ry = maxHeight;
+        ly -= delta_p.y();
+    }
+
+    topLeftPoint = QPoint(lx, ly);
+    bottomRightPoint = QPoint(rx, ry);
+    startPoint = topLeftPoint;
+    endPoint = bottomRightPoint;
+}
 bool Shape::isInArea(QPoint p)
 {
     if (p.x() > topLeftPoint.x() && p.x() < bottomRightPoint.x() && p.y() > topLeftPoint.y() && p.y() < bottomRightPoint.y()) {
@@ -115,11 +184,4 @@ bool Shape::isInArea(QPoint p)
 
    return false;
 }
-//void Shape::updateCursor()
-//{
-//    ScreenWidget::STATUS status = ScreenWidget::Instance()->getStatus();
-//    if (status == ScreenWidget::MOV)
-//    {
 
-//    }
-//}

@@ -4,6 +4,13 @@ ScreenWidget::ScreenWidget(QWidget *parent)
     : QWidget(parent)
 {
     qDebug() << "---ScreenWidget init---";
+
+    toolbar = new ToolbarWidget(this);
+    colorbar = new ColorToolbarWidget(this);
+
+    // 初始化devicePixel
+    scaleFactor = this->devicePixelRatio();
+
 }
 bool ScreenWidget::isActivity = false;
 ScreenWidget* ScreenWidget::self = nullptr;
@@ -59,9 +66,6 @@ void ScreenWidget::startCapture(int id)
     qDebug() << "startCapture screen_" << id;
 
     screenId = id;
-
-    // 初始化devicePixel
-    scaleFactor = this->devicePixelRatio();
 
     // 初始化截图状态
     setStatus(SELECT);
@@ -175,6 +179,10 @@ void ScreenWidget::mousePressEvent(QMouseEvent *e)
             m_captureRect.setStart(e->pos());
             break;
     case RESIZE:
+        qDebug() << "--- Press RESIZE 选框---";
+        s_movePoint = e->pos();
+        isPress = true;
+        updateToolBar();
         break;
     case MOV:
         if (!m_captureRect.isInArea(e->pos())) {
@@ -185,9 +193,11 @@ void ScreenWidget::mousePressEvent(QMouseEvent *e)
         qDebug() << "--- Press MOV 选框 ---";
         s_movePoint = e->pos();
         isPress = true;
+        updateToolBar();
         this->setCursor(Qt::SizeAllCursor);
         break;
     case DRAW:
+        updateToolBar();
         break;
     default:
         break;
@@ -207,14 +217,17 @@ void ScreenWidget::mouseMoveEvent(QMouseEvent *e)
             break;
     case RESIZE:
         qDebug() << "--- Move RESIZE ---";
+        m_captureRect.resize(e->pos() - s_movePoint, int(m_activeSide));
+        s_movePoint = e->pos();
+        this->update();
         qDebug() << "--- Move RESIZE UPDATE---";
         break;
     case MOV:
         qDebug() << "--- Move MOV ---";
-        int x = e->pos().x() - s_movePoint.x();
-        int y = e->pos().y() - s_movePoint.y();
-        QPoint p(x, y);
-        m_captureRect.move(p);
+//        int x = e->pos().x() - s_movePoint.x();
+//        int y = e->pos().y() - s_movePoint.y();
+//        QPoint p(x, y);
+        m_captureRect.move(e->pos() - s_movePoint);
         s_movePoint = e->pos();
         this->update();
         qDebug() << "--- Move MOV UPDATE---";
@@ -239,12 +252,14 @@ void ScreenWidget::mouseReleaseEvent(QMouseEvent *e)
             assistPixmap = QPixmap(getWidth(), getHeight());
             assistPixmap.fill(Qt::transparent);
             m_painter.drawPixmap(getX(), getY(), assistPixmap);
+            updateToolBar();
             qDebug() << "--- Release 结束SELECT选框 UPDATE ---";
 //            this->update();
             break;
     case RESIZE:
         this->setCursor(Qt::ArrowCursor);
         setStatus(MOV);
+        updateToolBar();
         break;
     case MOV:
         qDebug() << "--- Release 结束MOV选框 ---";
@@ -252,10 +267,12 @@ void ScreenWidget::mouseReleaseEvent(QMouseEvent *e)
         assistPixmap.fill(Qt::transparent);
         m_painter.drawPixmap(getX(), getY(), assistPixmap);
         this->setCursor(Qt::ArrowCursor);
+        updateToolBar();
         qDebug() << "--- Release 结束MOV选框 UPDATE ---";
 //        this->update();
         break;
     case DRAW:
+        updateToolBar();
         break;
     default:
         break;
@@ -276,6 +293,7 @@ void ScreenWidget::paintEvent(QPaintEvent*)
         drawSelectRect();
         break;
     case RESIZE:
+        drawSelectRect();
         break;
     case DRAW:
         break;
@@ -310,8 +328,7 @@ void ScreenWidget::drawResizeCircles()
 {
     qDebug() << "--- 开始画Resize点 ---";
 
-//    m_painter.begin(this);
-//    m_painter.save();
+
     int radius = 3 * scaleFactor;
     int x = getX();
     int y = getY();
@@ -344,8 +361,7 @@ void ScreenWidget::drawResizeCircles()
     m_painter.drawEllipse(circles[5],radius,radius);
     m_painter.drawEllipse(circles[6],radius,radius);
     m_painter.drawEllipse(circles[7],radius,radius);
-//    m_painter.restore();
-//    m_painter.end();
+
     qDebug() << "--- 结束画Resize点 ---";
 }
 
@@ -357,7 +373,6 @@ void ScreenWidget::changeCurcorToAnchor(QPoint p) {
     for (int i = 0; i < 8; i++)
     {
         QPoint c_Point = circles[i];
-        qDebug() << "circle_" << i << " x="<<c_Point.x()<<" y="<<c_Point.y();
 
         if (abs(x - c_Point.x()) <= radius && abs(y - c_Point.y()) <= radius)
         {
@@ -401,5 +416,29 @@ void ScreenWidget::changeCurcorToAnchor(QPoint p) {
                 break;
         }
     qDebug() << "--- changeCurcorToAnchor end ---";
+}
+
+void ScreenWidget::updateToolBar()
+{
+
+
+    qDebug() << "--- updateToolBar start ---";
+
+    QPoint p = m_captureRect.getBottomRightPoint();
+    toolbar->setPosition(p);
+    colorbar->setPosition(p);
+
+    qDebug() << isPress << getStatus();
+    if (!isPress && getStatus() != SELECT) {
+        toolbar->show();
+    } else {
+        toolbar->hide();
+    }
+
+    if (getStatus() == DRAW) {
+        colorbar->show();
+    }
+
+    qDebug() << "--- updateToolBar end ---";
 
 }
