@@ -6,18 +6,15 @@ ToolbarWidget::ToolbarWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ToolbarWidget)
 {
-    qDebug() << "--- ToolbarWidget Init ---";
 
     qDebug() << " parent "<< parent;
     // 坑爹的bug, 工具栏对应的ScreenWidget::Instance的指针与parent指向的不是同一个Widget
     // 导致 grab的x,y,w,h都为0
     m_screenWidget = dynamic_cast<ScreenWidget*>(parent);
 
-    qDebug() << " m_screenWidget "<< m_screenWidget;
 
     ui->setupUi(this);
     this->hide();
-    qDebug() << "--- ToolbarWidget end ---";
 }
 
 

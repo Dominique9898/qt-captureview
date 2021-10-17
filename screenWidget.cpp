@@ -3,8 +3,6 @@
 ScreenWidget::ScreenWidget(QWidget *parent)
     : QWidget(parent)
 {
-    qDebug() << "---ScreenWidget init---";
-
     toolbar = new ToolbarWidget(this);
     colorbar = new ColorToolbarWidget(this);
 
@@ -65,8 +63,6 @@ void ScreenWidget::destroy()
 
 void ScreenWidget::startCapture(int id)
 {
-    qDebug() << "startCapture screen_" << id;
-
     screenId = id;
 
     // 初始化截图状态
@@ -84,8 +80,6 @@ void ScreenWidget::startCapture(int id)
 void ScreenWidget::initOriginBackgroundScreen()
 {
     qDebug() << screenId;
-    qDebug() << "---initOriginBackgroundScreen start --- ";
-    qDebug() << "screen" << screenId;
 
     // 截取当前桌面，作为截屏的背景图
     w_screen = QApplication::screens()[screenId];
@@ -100,24 +94,17 @@ void ScreenWidget::initOriginBackgroundScreen()
     originBackgroundScreen = w_screen->grabWindow(winId(), s_x,
                                                 s_y, s_width,
                                                 s_height);
-    qDebug() << "get originBackgroundScreen";
-    qDebug() << "---initOriginBackgroundScreen end ---";
 }
 void ScreenWidget::initGrayBackgroundScreen()
 {
-    qDebug() << "---initGrayBackgroundScreen start --- ";
-
     /// 制作暗色屏幕背景
     QPixmap temp_dim_pix(s_width, s_height);
     temp_dim_pix.fill((QColor(0, 0, 0, 160)));
 
     grayBackgroundScreen = originBackgroundScreen;
-    qDebug() << "get grayBackgroundScreen";
 
     QPainter p(&grayBackgroundScreen);
-    qDebug() << "init grayBackgroundScreen QPainter";
     p.drawPixmap(0, 0, temp_dim_pix);
-    qDebug() << "paint grayBackgroundScreen";
 
     QPalette palette (this->palette());
     palette.setBrush(QPalette::Background,QBrush(grayBackgroundScreen));
@@ -203,20 +190,17 @@ void ScreenWidget::mouseMoveEvent(QMouseEvent *e)
     isMoving = true;
     switch (status) {
     case SELECT:
-            qDebug() << "--- Move SELECT ---";
             m_captureRect.setEnd(e->pos());
             this->update();
             qDebug() << "--- Move UPDATE ---";
             break;
     case RESIZE:
-        qDebug() << "--- Move RESIZE ---";
         m_captureRect.resize(e->pos() - s_movePoint, int(m_activeSide));
         s_movePoint = e->pos();
         this->update();
         qDebug() << "--- Move RESIZE UPDATE---";
         break;
     case MOV:
-        qDebug() << "--- Move MOV ---";
 //        int x = e->pos().x() - s_movePoint.x();
 //        int y = e->pos().y() - s_movePoint.y();
 //        QPoint p(x, y);
@@ -240,7 +224,6 @@ void ScreenWidget::mouseReleaseEvent(QMouseEvent *e)
     STATUS status = getStatus();
     switch (status) {
     case SELECT:
-            qDebug() << "--- Release 结束SELECT选框 ---";
             setStatus(MOV);
             updateToolBar();
             qDebug() << getX() << " " << getY()  << " " << getWidth()  << " " << getHeight();
@@ -253,7 +236,6 @@ void ScreenWidget::mouseReleaseEvent(QMouseEvent *e)
         updateToolBar();
         break;
     case MOV:
-        qDebug() << "--- Release 结束MOV选框 ---";
         this->setCursor(Qt::ArrowCursor);
         updateToolBar();
         qDebug() << "--- Release 结束MOV选框 UPDATE ---";
@@ -311,7 +293,6 @@ void ScreenWidget::drawSelectRect()
     drawResizeCircles();
     m_painter.restore();
     m_painter.end();
-    qDebug() << "--- drawSelectRect end ---";
 
 }
 void ScreenWidget::drawResizeCircles()
@@ -355,7 +336,6 @@ void ScreenWidget::drawResizeCircles()
     m_painter.drawEllipse(circles[6],radius,radius);
     m_painter.drawEllipse(circles[7],radius,radius);
 
-    qDebug() << "--- 结束画Resize点 ---";
 }
 
 void ScreenWidget::changeCurcorToAnchor(QPoint p) {
@@ -369,7 +349,6 @@ void ScreenWidget::changeCurcorToAnchor(QPoint p) {
 
         if (abs(x - c_Point.x()) <= radius && abs(y - c_Point.y()) <= radius)
         {
-            qDebug() << "has m_activeSide" << i;
             m_activeSide = MouseType(i);
             setStatus(RESIZE);
             break;
@@ -378,7 +357,6 @@ void ScreenWidget::changeCurcorToAnchor(QPoint p) {
             setCursor(Qt::ArrowCursor);
         }
     }
-    qDebug() << "m_activeSide = " << m_activeSide;
 
     switch (m_activeSide) {
             case TOPLEFT_SIDE:
@@ -411,7 +389,6 @@ void ScreenWidget::changeCurcorToAnchor(QPoint p) {
                 setCursor(Qt::ArrowCursor);
                 break;
         }
-    qDebug() << "--- changeCurcorToAnchor end ---";
 }
 
 void ScreenWidget::updateToolBar()
@@ -434,7 +411,6 @@ void ScreenWidget::updateToolBar()
         colorbar->show();
     }
 
-    qDebug() << "--- updateToolBar end ---";
 
 }
 void ScreenWidget::setDrawShape(Draw_Shape shape)
@@ -497,16 +473,13 @@ QPixmap ScreenWidget::getCaptureGrabPixmap()
     int h = getHeight() * scaleFactor;
 
     qDebug() << x << " " << y  << " " << w  << " " << h;
-    qDebug() << "-- getCaptureGrabPixmap end --";
 
     return originBackgroundScreen.copy(x, y, w, h);
 }
 void ScreenWidget::capture() {
     qDebug() << "--- capture start ---";
     QPixmap pix = getCaptureGrabPixmap();
-    qDebug() << "capture pix=" << pix;
     QClipboard* clipboard = QApplication::clipboard();
     clipboard->setImage(pix.toImage());
     closeCaptureWindows();
-    qDebug() << "--- capture end ---";
 }
