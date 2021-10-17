@@ -18,6 +18,15 @@ set(PROJECT_SOURCES
         main.cpp
         screenWidget.cpp
         screenWidget.h
+        ww_resources.qrc
+        Shape/shape/shape.cpp
+        Shape/shape/shape.h
+        UI/toolbarwidget/toolbarwidget.cpp
+        UI/toolbarwidget/toolbarwidget.h
+        UI/toolbarwidget/toolbarwidget.ui
+        UI/colortoolbarwidget/colortoolbarwidget.cpp
+        UI/colortoolbarwidget/colortoolbarwidget.h
+        UI/colortoolbarwidget/colortoolbarwidget.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

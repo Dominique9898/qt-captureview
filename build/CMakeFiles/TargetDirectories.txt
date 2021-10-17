@@ -1,0 +1,4 @@
+/Users/dominikwei/Documents/work/captureview/captureview/build/CMakeFiles/rebuild_cache.dir
+/Users/dominikwei/Documents/work/captureview/captureview/build/CMakeFiles/edit_cache.dir
+/Users/dominikwei/Documents/work/captureview/captureview/build/CMakeFiles/captureview.dir
+/Users/dominikwei/Documents/work/captureview/captureview/build/CMakeFiles/captureview_autogen.dir
