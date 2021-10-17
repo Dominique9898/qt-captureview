@@ -1,7 +1,7 @@
 #ifndef SCREENCAPTURE_H
 #include "UI/colortoolbarwidget/colortoolbarwidget.h"
 #include "UI/toolbarwidget/toolbarwidget.h"
-
+#include "selectwidget.h"
 #include <QWidget>
 #include <QApplication>
 #include <QDesktopWidget>
@@ -11,6 +11,9 @@
 #include <QMouseEvent>
 #include <QDebug>
 #include <QMutex>
+#include <QClipboard>
+#include <QDateTime>
+#include <QFileDialog>
 #include "Shape/shape/shape.h"
 #include <math.h>
 #define SCREENCAPTURE_H
@@ -35,6 +38,7 @@ public:
         BOTTOMLEFT_SIDE, // SizeBDiagCursor
         BOTTOM_SIDE, // SizeVerCursor
         BOTTOMRIGHT_SIDE, // SizeFDiagCursor,
+        DEFAULT
     };
 
     ///控制选区变化的圆点
@@ -54,8 +58,16 @@ public:
 
     void setStatus(STATUS status);
     STATUS getStatus();
+    void setDrawShape(Draw_Shape shape);
+    void setDrawColor(Draw_Color color);
+    void setDrawSize(Draw_Size size);
+    void clearShapes();
+    void saveCapture();
 
-
+    /// 截图
+    void capture();
+    /// 关闭截图
+    void closeCaptureWindows();
 signals:
     void lastWindowClosed();
 
@@ -68,7 +80,8 @@ private:
     int s_x; /// screen的左上角x位置
     int s_y; /// screen的左上角y位置
     bool isPress = false;
-    bool isRelease = true;
+    bool isMoving = false;
+    bool isDrawing = false;
     int scaleFactor;
 
     STATUS status;
@@ -98,6 +111,8 @@ private:
 
     /// 辅助涂鸦画布(resize点)
     QPixmap assistPixmap;
+
+    SelectWidget* selectWidget;
 
     ToolbarWidget* toolbar;
     ColorToolbarWidget* colorbar;
@@ -154,8 +169,6 @@ private:
     int getX();
     int getY();
 
-    void closeCaptureWindows();
-
     /// 绘制拉取的选框的原图
     void drawSelectRect();
 
@@ -168,6 +181,8 @@ private:
     void changeCurcorToAnchor(QPoint p);
 
     void updateToolBar();
+
+    QPixmap getCaptureGrabPixmap();
 
 };
 #endif // SCREENCAPTURE_H

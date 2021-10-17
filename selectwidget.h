@@ -1,29 +1,35 @@
 #ifndef SELECTWIDGET_H
 #include <QWidget>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QPainterPath>
+#include <QGraphicsPixmapItem>
+#include <QDebug>
 #define SELECTWIDGET_H
 
 
-class selectWidget : public QWidget
+class SelectWidget : public QWidget
 {
     Q_OBJECT
 public:
-    selectWidget();
-    void setGeometryAnimated(const QRect& r);
-    void setGeometry(const QRect& r);
-    QRect geometry() const;
+    explicit SelectWidget(QWidget *parent = nullptr);
+
+    static SelectWidget* Instance();
+    void setPosition(int x, int y, int width, int height);
+
+private:
+
+    static SelectWidget* self;
+
+    // 拉取后的选区位置
+    QRect rect;
+    QGraphicsScene scene;
+    QGraphicsView view;
 
 protected:
-    bool eventFilter(QObject*, QEvent*) override;
-    void parentMousePressEvent(QMouseEvent* e);
-    void parentMouseReleaseEvent(QMouseEvent* e);
-    void parentMouseMoveEvent(QMouseEvent* e);
+    virtual void paintEvent(QPaintEvent *);
 
-    void paintEvent(QPaintEvent*);
-    void resizeEvent(QResizeEvent*);
-    void moveEvent(QMoveEvent*);
 
-    void showEvent(QShowEvent*) override;
-    void hideEvent(QHideEvent*) override;
 };
 
 #endif // SELECTWIDGET_H

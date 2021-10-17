@@ -43,7 +43,19 @@ QPoint Shape::getBottomRightPoint()
 {
     return bottomRightPoint;
 }
+void Shape::setDrawSize(Draw_Size size)
+{
+    _size = size;
+}
 
+void Shape::setDrawColor(Draw_Color color)
+{
+    _color = color;
+}
+void Shape::setDrawShape(Draw_Shape shape)
+{
+    _shape = shape;
+}
 void Shape::comparePoint(QPoint &topLeftPoint, QPoint &BottomRightPoint)
 {
     QPoint l = topLeftPoint;
@@ -175,6 +187,15 @@ void Shape::resize(QPoint delta_p, int m_activeSide) {
     bottomRightPoint = QPoint(rx, ry);
     startPoint = topLeftPoint;
     endPoint = bottomRightPoint;
+}
+void Shape::clear()
+{
+    startPoint.setX(0);
+    startPoint.setY(0);
+    endPoint.setX(0);
+    endPoint.setY(0);
+    topLeftPoint = startPoint;
+    bottomRightPoint = endPoint;
 }
 bool Shape::isInArea(QPoint p)
 {

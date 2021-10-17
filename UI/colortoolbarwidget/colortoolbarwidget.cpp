@@ -1,5 +1,6 @@
 #include "colortoolbarwidget.h"
 #include "ui_colortoolbarwidget.h"
+#include <screenWidget.h>
 
 ColorToolbarWidget::ColorToolbarWidget(QWidget *parent) :
     QWidget(parent),
@@ -45,24 +46,24 @@ void ColorToolbarWidget::on_pushButtonSmall_clicked()
 {
     uncheckAllSize();
     ui->pushButtonSmall->setChecked(true);
-//    ScreenCapture::Instance()->setDrawSize(Small);
-//    ScreenCapture::Instance()->clearShapes();
+    ScreenWidget::Instance()->setDrawSize(Small);
+//    ScreenWidget::Instance()->clearShapes();
 }
 
 void ColorToolbarWidget::on_pushButtonMiddle_clicked()
 {
     uncheckAllSize();
     ui->pushButtonMiddle->setChecked(true);
-//    ScreenCapture::Instance()->setDrawSize(Middle);
-//    ScreenCapture::Instance()->clearShapes();
+    ScreenWidget::Instance()->setDrawSize(Middle);
+//    ScreenWidget::Instance()->clearShapes();
 }
 
 void ColorToolbarWidget::on_pushButtonLarge_clicked()
 {
     uncheckAllSize();
     ui->pushButtonLarge->setChecked(true);
-//    ScreenCapture::Instance()->setDrawSize(Large);
-//    ScreenCapture::Instance()->clearShapes();
+    ScreenWidget::Instance()->setDrawSize(Large);
+//    ScreenWidget::Instance()->clearShapes();
 }
 
 
@@ -70,8 +71,8 @@ void ColorToolbarWidget::on_pushButtonBlue_clicked()
 {
     uncheckAllColor();
     ui->pushButtonBlue->setChecked(true);
-//    ScreenCapture::Instance()->setDrawColor(Blue);
-//    ScreenCapture::Instance()->clearShapes();
+    ScreenWidget::Instance()->setDrawColor(Blue);
+//    ScreenWidget::Instance()->clearShapes();
 }
 
 
@@ -79,8 +80,8 @@ void ColorToolbarWidget::on_pushButtonGray_clicked()
 {
     uncheckAllColor();
     ui->pushButtonGray->setChecked(true);
-//    ScreenCapture::Instance()->setDrawColor(Gray);
-//    ScreenCapture::Instance()->clearShapes();
+    ScreenWidget::Instance()->setDrawColor(Gray);
+//    ScreenWidget::Instance()->clearShapes();
 }
 
 
@@ -88,16 +89,16 @@ void ColorToolbarWidget::on_pushButtonGreen_clicked()
 {
     uncheckAllColor();
     ui->pushButtonGreen->setChecked(true);
-//    ScreenCapture::Instance()->setDrawColor(Green);
-//    ScreenCapture::Instance()->clearShapes();
+    ScreenWidget::Instance()->setDrawColor(Green);
+//    ScreenWidget::Instance()->clearShapes();
 }
 
 void ColorToolbarWidget::on_pushButtonRed_clicked()
 {
     uncheckAllColor();
     ui->pushButtonRed->setChecked(true);
-//    ScreenCapture::Instance()->setDrawColor(Red);
-//    ScreenCapture::Instance()->clearShapes();
+    ScreenWidget::Instance()->setDrawColor(Red);
+//    ScreenWidget::Instance()->clearShapes();
 }
 
 
@@ -105,8 +106,8 @@ void ColorToolbarWidget::on_pushButtonWhite_clicked()
 {
     uncheckAllColor();
     ui->pushButtonWhite->setChecked(true);
-//    ScreenCapture::Instance()->setDrawColor(White);
-//    ScreenCapture::Instance()->clearShapes();
+    ScreenWidget::Instance()->setDrawColor(White);
+//    ScreenWidget::Instance()->clearShapes();
 }
 
 
@@ -114,7 +115,7 @@ void ColorToolbarWidget::on_pushButtonYellow_clicked()
 {
     uncheckAllColor();
     ui->pushButtonYellow->setChecked(true);
-//    ScreenCapture::Instance()->setDrawColor(Yellow);
-//    ScreenCapture::Instance()->clearShapes();
+    ScreenWidget::Instance()->setDrawColor(Yellow);
+//    ScreenWidget::Instance()->clearShapes();
 }
 

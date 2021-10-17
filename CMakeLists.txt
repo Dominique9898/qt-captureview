@@ -18,8 +18,8 @@ set(PROJECT_SOURCES
         main.cpp
         screenWidget.cpp
         screenWidget.h
-#        selectwidget.cpp
-#        selectwidget.h
+        selectwidget.cpp
+        selectwidget.h
         ww_resources.qrc
         Shape/shape/shape.cpp
         Shape/shape/shape.h

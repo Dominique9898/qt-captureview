@@ -8,6 +8,8 @@ ScreenWidget::ScreenWidget(QWidget *parent)
     toolbar = new ToolbarWidget(this);
     colorbar = new ColorToolbarWidget(this);
 
+//    selectWidget = new SelectWidget(this);
+
     // 初始化devicePixel
     scaleFactor = this->devicePixelRatio();
 
@@ -154,22 +156,13 @@ void ScreenWidget::keyPressEvent(QKeyEvent *e)
 {
     if(e->key() == Qt::Key_Escape)
     {
-        qDebug() << "-- 结束截图 --";
-        qDebug() << "close ScreenWidget" << this;
-        close();
-        qDebug() << "emit lastWindowClosed";
-        emit lastWindowClosed();
-        qDebug() << "destroy ScreenWidget";
-        destroy();
-        QApplication::quit();
-        qDebug() << "-- 结束截图 --";
+        closeCaptureWindows();
     }
 }
 void ScreenWidget::mousePressEvent(QMouseEvent *e)
 {
     if (!(e->buttons() & Qt::LeftButton)) return;
-    changeCurcorToAnchor(e->pos());
-
+    if (getStatus() != SELECT) changeCurcorToAnchor(e->pos());
     STATUS status = getStatus();
 
     switch (status) {
@@ -180,8 +173,8 @@ void ScreenWidget::mousePressEvent(QMouseEvent *e)
             break;
     case RESIZE:
         qDebug() << "--- Press RESIZE 选框---";
-        s_movePoint = e->pos();
         isPress = true;
+        s_movePoint = e->pos();
         updateToolBar();
         break;
     case MOV:
@@ -206,8 +199,8 @@ void ScreenWidget::mousePressEvent(QMouseEvent *e)
 
 void ScreenWidget::mouseMoveEvent(QMouseEvent *e)
 {
-    if (!(e->buttons() & Qt::LeftButton) || !isPress) return;
     STATUS status = getStatus();
+    isMoving = true;
     switch (status) {
     case SELECT:
             qDebug() << "--- Move SELECT ---";
@@ -242,17 +235,15 @@ void ScreenWidget::mouseMoveEvent(QMouseEvent *e)
 void ScreenWidget::mouseReleaseEvent(QMouseEvent *e)
 {
     isPress = false;
-    if (getWidth() == 0 && getHeight() == 0) return;
+    if (getWidth() == 0 && getHeight() == 0 || !isMoving) return;
+//    if (m_captureRect.isInArea(e->pos()) == false) return;
     STATUS status = getStatus();
     switch (status) {
     case SELECT:
             qDebug() << "--- Release 结束SELECT选框 ---";
-            m_captureRect.setEnd(e->pos());
             setStatus(MOV);
-            assistPixmap = QPixmap(getWidth(), getHeight());
-            assistPixmap.fill(Qt::transparent);
-            m_painter.drawPixmap(getX(), getY(), assistPixmap);
             updateToolBar();
+            qDebug() << getX() << " " << getY()  << " " << getWidth()  << " " << getHeight();
             qDebug() << "--- Release 结束SELECT选框 UPDATE ---";
 //            this->update();
             break;
@@ -263,9 +254,6 @@ void ScreenWidget::mouseReleaseEvent(QMouseEvent *e)
         break;
     case MOV:
         qDebug() << "--- Release 结束MOV选框 ---";
-        assistPixmap = QPixmap(getWidth(), getHeight());
-        assistPixmap.fill(Qt::transparent);
-        m_painter.drawPixmap(getX(), getY(), assistPixmap);
         this->setCursor(Qt::ArrowCursor);
         updateToolBar();
         qDebug() << "--- Release 结束MOV选框 UPDATE ---";
@@ -277,22 +265,23 @@ void ScreenWidget::mouseReleaseEvent(QMouseEvent *e)
     default:
         break;
     }
+    isMoving = false;
 }
 void ScreenWidget::paintEvent(QPaintEvent*)
 {
     STATUS status = getStatus();
     switch (status) {
     case SELECT:
-            if (getWidth() == 0 && getHeight() == 0) return;
-            if (!isPress) drawResizeCircles();
+           qDebug() << "--- paintEvent SELECT";
             drawSelectRect();
             break;
     case MOV:
-        if (getWidth() == 0 && getHeight() == 0) return;
-        if (!isPress) drawResizeCircles();
+        if (!isPress) return;
+        qDebug() << "--- paintEvent MOV";
         drawSelectRect();
         break;
     case RESIZE:
+        qDebug() << "--- paintEvent RESIZE";
         drawSelectRect();
         break;
     case DRAW:
@@ -305,6 +294,7 @@ void ScreenWidget::paintEvent(QPaintEvent*)
 void ScreenWidget::drawSelectRect()
 {
     qDebug() << "--- drawSelectRect start ---";
+    if (!isPress && !isMoving) return;
     m_painter.begin(this);
     m_painter.save();
     QPen pen;
@@ -328,6 +318,9 @@ void ScreenWidget::drawResizeCircles()
 {
     qDebug() << "--- 开始画Resize点 ---";
 
+    qDebug() << "isPress " << isPress << " isMoving " << isMoving;
+
+    if (!isPress && !isMoving) return;
 
     int radius = 3 * scaleFactor;
     int x = getX();
@@ -380,6 +373,9 @@ void ScreenWidget::changeCurcorToAnchor(QPoint p) {
             m_activeSide = MouseType(i);
             setStatus(RESIZE);
             break;
+        } else {
+            m_activeSide = DEFAULT;
+            setCursor(Qt::ArrowCursor);
         }
     }
     qDebug() << "m_activeSide = " << m_activeSide;
@@ -428,7 +424,6 @@ void ScreenWidget::updateToolBar()
     toolbar->setPosition(p);
     colorbar->setPosition(p);
 
-    qDebug() << isPress << getStatus();
     if (!isPress && getStatus() != SELECT) {
         toolbar->show();
     } else {
@@ -441,4 +436,77 @@ void ScreenWidget::updateToolBar()
 
     qDebug() << "--- updateToolBar end ---";
 
+}
+void ScreenWidget::setDrawShape(Draw_Shape shape)
+{
+    m_captureRect.setDrawShape(shape);
+    setStatus(DRAW);
+    colorbar->show();
+}
+void ScreenWidget::setDrawColor(Draw_Color color)
+{
+    m_captureRect.setDrawColor(color);
+}
+void ScreenWidget::setDrawSize(Draw_Size size)
+{
+    m_captureRect.setDrawSize(size);
+}
+void ScreenWidget::clearShapes()
+{
+    m_captureRect.clear();
+}
+void ScreenWidget::saveCapture()
+{
+    QString picName = "政务微信";
+    QDateTime current_date_time = QDateTime::currentDateTime();
+    QString current_date = current_date_time.toString("yyyyMMdd-hhmmss");
+    picName += current_date;
+
+    QString srcDirPath = QFileDialog::getSaveFileName(
+                this,
+                tr("存储"),
+                QDir::homePath()+"/Desktop/"+picName,
+                tr("Images (*.png *.bmp *.jpg)"));
+    if (srcDirPath.isEmpty())
+    {
+        return;
+    }
+    QPixmap pix = getCaptureGrabPixmap();
+    pix.toImage().save(srcDirPath);
+    closeCaptureWindows();
+}
+void ScreenWidget::closeCaptureWindows()
+{
+    qDebug() << "-- 结束截图 --";
+    qDebug() << "close ScreenWidget" << this;
+    close();
+    qDebug() << "emit lastWindowClosed";
+    emit lastWindowClosed();
+    qDebug() << "destroy ScreenWidget";
+    destroy();
+    QApplication::quit();
+    qDebug() << "-- 结束截图 --";
+}
+QPixmap ScreenWidget::getCaptureGrabPixmap()
+{
+    qDebug() << "-- getCaptureGrabPixmap start --";
+
+    int x = getX() * scaleFactor;
+    int y = getY() * scaleFactor;
+    int w = getWidth() * scaleFactor;
+    int h = getHeight() * scaleFactor;
+
+    qDebug() << x << " " << y  << " " << w  << " " << h;
+    qDebug() << "-- getCaptureGrabPixmap end --";
+
+    return originBackgroundScreen.copy(x, y, w, h);
+}
+void ScreenWidget::capture() {
+    qDebug() << "--- capture start ---";
+    QPixmap pix = getCaptureGrabPixmap();
+    qDebug() << "capture pix=" << pix;
+    QClipboard* clipboard = QApplication::clipboard();
+    clipboard->setImage(pix.toImage());
+    closeCaptureWindows();
+    qDebug() << "--- capture end ---";
 }
