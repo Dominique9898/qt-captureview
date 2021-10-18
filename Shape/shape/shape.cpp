@@ -163,7 +163,6 @@ void Shape::resize(QPoint delta_p, int m_activeSide) {
                 break;
         }
 
-    qDebug() << "lx=" << lx << "ly=" << ly<< "rx" << rx << "ry" << ry;
 
     topLeftPoint = QPoint(lx, ly);
     bottomRightPoint = QPoint(rx, ry);

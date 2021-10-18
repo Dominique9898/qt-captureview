@@ -273,7 +273,6 @@ void ScreenWidget::paintEvent(QPaintEvent*)
 }
 void ScreenWidget::drawSelectRect()
 {
-    qDebug() << "--- drawSelectRect start ---";
     m_painter.begin(this);
     m_painter.save();
     QPen pen;
@@ -282,8 +281,19 @@ void ScreenWidget::drawSelectRect()
     pen.setStyle(Qt::SolidLine);
     m_painter.setPen(pen);
 
+
+    qDebug() << "lx=" << getX() << "ly=" << getY();
+    qDebug() << "rx="  <<  m_captureRect.getBottomRightPoint().x() << "rx=" << m_captureRect.getBottomRightPoint().y();
+    qDebug() << "w=" << getWidth() << "h=" << getHeight();
     if (getWidth() != 0 && getHeight() != 0) {
-            m_painter.drawPixmap(getX(), getY(), originBackgroundScreen.copy(getX() * scaleFactor, getY() * scaleFactor, getWidth() * scaleFactor, getHeight() * scaleFactor));
+        int x = getX();
+        int y = getY();
+        int w = std::abs(getWidth());
+        int h = std::abs(getHeight());
+        if (x > m_captureRect.getBottomRightPoint().x()) x = m_captureRect.getBottomRightPoint().x();
+        if (y > m_captureRect.getBottomRightPoint().y()) y = m_captureRect.getBottomRightPoint().y();
+        QPixmap pix = originBackgroundScreen.copy(x * scaleFactor, y * scaleFactor, w * scaleFactor, h * scaleFactor);
+        m_painter.drawPixmap(x, y, pix);
     }
 
     m_painter.drawRect(getX(), getY(), getWidth(), getHeight());
@@ -294,11 +304,6 @@ void ScreenWidget::drawSelectRect()
 }
 void ScreenWidget::drawResizeCircles()
 {
-    qDebug() << "--- 开始画Resize点 ---";
-
-    qDebug() << "isPress " << isPress << " isMoving " << isMoving;
-
-    if (!isPress && !isMoving) return;
 
     int radius = 3 * scaleFactor;
     int x = getX();
@@ -450,12 +455,8 @@ void ScreenWidget::saveCapture()
 }
 void ScreenWidget::closeCaptureWindows()
 {
-    qDebug() << "-- 结束截图 --";
-    qDebug() << "close ScreenWidget" << this;
     close();
-    qDebug() << "emit lastWindowClosed";
     emit lastWindowClosed();
-    qDebug() << "destroy ScreenWidget";
     destroy();
     QApplication::quit();
     qDebug() << "-- 结束截图 --";
