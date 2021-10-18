@@ -231,10 +231,21 @@ void ScreenWidget::mouseReleaseEvent(QMouseEvent *e)
 //            this->update();
             break;
     case RESIZE:
+    {
+        // 调整resize rect
+        int x = getX();
+        int y = getY();
+        int w = std::abs(getWidth());
+        int h = std::abs(getHeight());
+        if (x > m_captureRect.getBottomRightPoint().x()) x = m_captureRect.getBottomRightPoint().x();
+        if (y > m_captureRect.getBottomRightPoint().y()) y = m_captureRect.getBottomRightPoint().y();
+        m_captureRect.setStart(QPoint(x, y));
+        m_captureRect.setEnd(QPoint(x + w, y + h));
         this->setCursor(Qt::ArrowCursor);
         setStatus(MOV);
         updateToolBar();
         break;
+    }
     case MOV:
         this->setCursor(Qt::ArrowCursor);
         updateToolBar();
@@ -286,6 +297,8 @@ void ScreenWidget::drawSelectRect()
     qDebug() << "rx="  <<  m_captureRect.getBottomRightPoint().x() << "rx=" << m_captureRect.getBottomRightPoint().y();
     qDebug() << "w=" << getWidth() << "h=" << getHeight();
     if (getWidth() != 0 && getHeight() != 0) {
+        // todo
+        // resize的rect的点需要优化
         int x = getX();
         int y = getY();
         int w = std::abs(getWidth());
