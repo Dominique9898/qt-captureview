@@ -6,11 +6,12 @@ ScreenWidget::ScreenWidget(QWidget *parent)
     toolbar = new ToolbarWidget(this);
     colorbar = new ColorToolbarWidget(this);
 
-//    selectWidget = new SelectWidget(this);
+    selectWidget = new SelectWidget(this);
 
     // 初始化devicePixel
     scaleFactor = this->devicePixelRatio();
 
+    m_captureRect.clear();
 }
 bool ScreenWidget::isActivity = false;
 ScreenWidget* ScreenWidget::self = nullptr;
@@ -45,7 +46,7 @@ void ScreenWidget::initCaptureWindow()
 
     Qt::WindowFlags windowFlags =  Qt::FramelessWindowHint |
             Qt::BypassWindowManagerHint |
-            Qt::WindowStaysOnTopHint |
+//            Qt::WindowStaysOnTopHint |
             Qt::NoDropShadowWindowHint;
 
     this->setWindowFlags(windowFlags);
@@ -201,9 +202,7 @@ void ScreenWidget::mouseMoveEvent(QMouseEvent *e)
         qDebug() << "--- Move RESIZE UPDATE---";
         break;
     case MOV:
-//        int x = e->pos().x() - s_movePoint.x();
-//        int y = e->pos().y() - s_movePoint.y();
-//        QPoint p(x, y);
+        if (!isPress) return;
         m_captureRect.move(e->pos() - s_movePoint);
         s_movePoint = e->pos();
         this->update();
@@ -222,13 +221,13 @@ void ScreenWidget::mouseReleaseEvent(QMouseEvent *e)
     if (getWidth() == 0 && getHeight() == 0 || !isMoving) return;
 //    if (m_captureRect.isInArea(e->pos()) == false) return;
     STATUS status = getStatus();
+//    selectWidget->Show(getX(), getY(), getWidth(), getHeight());
     switch (status) {
     case SELECT:
             setStatus(MOV);
             updateToolBar();
-            qDebug() << getX() << " " << getY()  << " " << getWidth()  << " " << getHeight();
-            qDebug() << "--- Release 结束SELECT选框 UPDATE ---";
 //            this->update();
+            qDebug() << "--- Release 结束SELECT选框 UPDATE ---";
             break;
     case RESIZE:
     {
@@ -262,17 +261,19 @@ void ScreenWidget::mouseReleaseEvent(QMouseEvent *e)
 }
 void ScreenWidget::paintEvent(QPaintEvent*)
 {
-    drawSelectRect();
     STATUS status = getStatus();
     switch (status) {
     case SELECT:
+            drawSelectRect();
            qDebug() << "--- paintEvent SELECT";
             break;
     case MOV:
         if (!isPress) return;
+        drawSelectRect();
         qDebug() << "--- paintEvent MOV";
         break;
     case RESIZE:
+        drawSelectRect();
         qDebug() << "--- paintEvent RESIZE";
         break;
     case DRAW:
@@ -318,6 +319,7 @@ void ScreenWidget::drawSelectRect()
 void ScreenWidget::drawResizeCircles()
 {
 
+    if (getWidth() == 0 || getHeight() == 0) return;
     int radius = 3 * scaleFactor;
     int x = getX();
     int y = getY();

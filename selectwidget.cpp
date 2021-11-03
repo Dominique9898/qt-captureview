@@ -22,35 +22,37 @@ SelectWidget::SelectWidget(QWidget *parent)
             Qt::BypassWindowManagerHint |
             Qt::WindowStaysOnTopHint |
             Qt::NoDropShadowWindowHint;
-    this->setWindowFlags(windowFlags);
-
-    setGeometry(0, 0, 200, 100);
-//    update();
-    show();
-
-    QGraphicsScene scene(0, 0, 200, 100);
-    QGraphicsView view(&scene);
-    QGraphicsPixmapItem *item;
-    QPixmap* painterPix;
-
-    view.setMinimumSize(200, 100);
-    view.setSceneRect(0, 0, 200, 100);
-
-    auto rect = new QGraphicsRectItem(10, 10, 50, 50);
-    rect->setPos(0, 0);
-    scene.addItem(rect);
-    view.show();
-
+    setWindowFlags(windowFlags);
+    setAttribute(Qt::WA_TranslucentBackground, true);
+//    setGeometry(0, 0, 200, 100);
+    update();
+    hide();
 }
 
 void SelectWidget::paintEvent(QPaintEvent *)
 {
-//    QPen pen;
-//    pen.setColor(QColor("#67bade"));
-//    pen.setWidth(2);
-//    pen.setStyle(Qt::SolidLine);
-//    QPainter painter;
-//    painter.begin(this);
-//    painter.drawRect(10,10,50,50);
-//    painter.end();
+    QPainter painter(this);
+    painter.setPen(Qt::yellow);
+    painter.begin(this);
+    painter.drawRect(10,10,50,50);
+    painter.end();
+}
+void SelectWidget::Show(int sx, int sy, int w, int h)
+{
+    setAttribute(Qt::WA_TranslucentBackground, true);
+    _show = true;
+    setGeometry(sx, sy, w, h);
+    show();
+//    update();
+}
+
+void SelectWidget::Hide()
+{
+    _show = false;
+    this->hide();
+}
+
+bool SelectWidget::isShow()
+{
+    return _show;
 }

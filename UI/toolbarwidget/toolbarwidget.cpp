@@ -12,7 +12,6 @@ ToolbarWidget::ToolbarWidget(QWidget *parent) :
     // 导致 grab的x,y,w,h都为0
     m_screenWidget = dynamic_cast<ScreenWidget*>(parent);
 
-
     ui->setupUi(this);
     this->hide();
 }
@@ -50,13 +49,13 @@ void ToolbarWidget::on_checkBtn_clicked()
 
 void ToolbarWidget::on_cancelBtn_clicked()
 {
-//    ScreenWidget::Instance()->closeCaptureWindows();
+    m_screenWidget->closeCaptureWindows();
 }
 
 
 void ToolbarWidget::on_saveBtn_clicked()
 {
-//    ScreenWidget::Instance()->saveCapture();
+    m_screenWidget->saveCapture();
 }
 
 
@@ -64,8 +63,8 @@ void ToolbarWidget::on_rectangleBtn_clicked()
 {
     unCheckedAllButtons();
     ui->rectangleBtn->setChecked(true);
-//    ScreenWidget::Instance()->setDrawShape(Rectangle);
-//    ScreenWidget::Instance()->clearShapes();
+    m_screenWidget->setDrawShape(Rectangle);
+    m_screenWidget->clearShapes();
 }
 
 
@@ -73,8 +72,8 @@ void ToolbarWidget::on_drawRoundBtn_clicked()
 {
     unCheckedAllButtons();
     ui->drawRoundBtn->setChecked(true);
-//    ScreenWidget::Instance()->setDrawShape(Round);
-//    ScreenWidget::Instance()->clearShapes();
+    m_screenWidget->setDrawShape(Round);
+    m_screenWidget->clearShapes();
 }
 
 
@@ -82,8 +81,8 @@ void ToolbarWidget::on_drawLineBtn_clicked()
 {
     unCheckedAllButtons();
     ui->drawLineBtn->setChecked(true);
-//    ScreenWidget::Instance()->setDrawShape(Line);
-//    ScreenWidget::Instance()->clearShapes(); // 格式化mShape
+    m_screenWidget->setDrawShape(Line);
+    m_screenWidget->clearShapes(); // 格式化mShape
 }
 
 
@@ -91,8 +90,8 @@ void ToolbarWidget::on_arrowBtn_clicked()
 {
     unCheckedAllButtons();
     ui->arrowBtn->setChecked(true);
-//    ScreenWidget::Instance()->setDrawShape(Arrow);
-//    ScreenWidget::Instance()->clearShapes();
+    m_screenWidget->setDrawShape(Arrow);
+    m_screenWidget->clearShapes();
 }
 
 
@@ -100,14 +99,13 @@ void ToolbarWidget::on_textEditBtn_clicked()
 {
     unCheckedAllButtons();
     ui->textEditBtn->setChecked(true);
-//    ScreenWidget::Instance()->setDrawShape(Text);
-//    ScreenWidget::Instance()->clearShapes();
+    m_screenWidget->setDrawShape(Text);
+    m_screenWidget->clearShapes();
 }
 
 
 void ToolbarWidget::on_returneditBtn_clicked()
 {
-//    ScreenWidget::Instance()->undo();
-
+//    m_screenWidget->undo();
 }
 

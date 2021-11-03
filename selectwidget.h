@@ -15,16 +15,20 @@ public:
     explicit SelectWidget(QWidget *parent = nullptr);
 
     static SelectWidget* Instance();
-    void setPosition(int x, int y, int width, int height);
+    bool isShow();
+    void Show(int sx, int sy, int w, int h);
+    void Hide();
 
 private:
 
     static SelectWidget* self;
+    bool _show;
 
     // 拉取后的选区位置
     QRect rect;
     QGraphicsScene scene;
     QGraphicsView view;
+    QPainterPath path;
 
 protected:
     virtual void paintEvent(QPaintEvent *);

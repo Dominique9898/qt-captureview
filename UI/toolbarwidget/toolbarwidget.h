@@ -23,6 +23,7 @@ public:
     Ui::ToolbarWidget* getUi();
     ScreenWidget* m_screenWidget;
 
+
 private slots:
 
 
@@ -46,6 +47,8 @@ private slots:
 
 private:
     Ui::ToolbarWidget *ui;
+
+    bool _show;
 };
 
 #endif // TOOLBARWIDGET_H
